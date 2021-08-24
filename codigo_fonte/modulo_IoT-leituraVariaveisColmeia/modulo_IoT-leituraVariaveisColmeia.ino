@@ -30,6 +30,7 @@ void loop() {
  
   int  gas = analogRead(pinoGas);
   bool movimento = digitalRead(pinoSensorMovimento);
+  // verificar uma forma automatizada para salvar os dados de movimento, mais que os outros...pensar sobre isso
   escreveCartao(gas,movimento);
   
   delay(TIME_DELAY);
