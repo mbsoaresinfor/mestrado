@@ -10,6 +10,9 @@
 
 const int sensorTemperaturaPin = 7; // Define pino do sensor
 
+unsigned long contadorAbelha = 0;
+bool s_high=0;
+
 // objetos.
 OneWire oneWire(sensorTemperaturaPin); // Cria um objeto OneWire
 DallasTemperature sensor(&oneWire); // Informa a referencia da biblioteca dallas temperature para Biblioteca onewire
@@ -17,33 +20,51 @@ DeviceAddress endereco_temp; // Cria um endereco temporario da leitura do sensor
 
 
 // variaveis diversas.
-int TIME_DELAY = 1000;
+int TIME_DELAY = 100;
+int UM_MINUTO = 10 * 60;
+int contadorLoopParaLeitura = 0;
+
 
 void setup() {
   Serial.begin(9600);   
   setupPinos();
-  Serial.print("Setup config");
+  Serial.println("Setup config");
 
 }
-
+// TODO tirar todos os print de log, 
 void loop() {
- 
-  int  gas = analogRead(pinoGas);
+
+   if(contadorLoopParaLeitura == UM_MINUTO){
+      int  gas = analogRead(pinoGas);            
+      escreveCartao(contadorAbelha,gas);
+      contadorLoopParaLeitura = 0;
+   }else{
+      contadorLoopParaLeitura++;
+   }
+   
+  // contadorAbelhas
   bool movimento = digitalRead(pinoSensorMovimento);
-  // verificar uma forma automatizada para salvar os dados de movimento, mais que os outros...pensar sobre isso
-  escreveCartao(gas,movimento);
+  if(movimento){ 
+    s_high = 1;
+   }
+
+  if(!movimento && s_high){
+    s_high =0;
+    contadorAbelha+=1;
+    Serial.println(contadorAbelha); // TODO DEPOIS TIRAR ESTE LOG.
+  }
   
   delay(TIME_DELAY);
 
 }
 
-// valorgaz;
-void escreveCartao(int gas, bool movimento){
+// valores: contador;gas
+void escreveCartao(int contador,int gas){
   String token = ";";
   String message = "";
   message.concat(String(gas));    
   message.concat(String(token));    
-  message.concat(String(movimento));
+  message.concat(String(contador));
   message.concat(String(token));        
   Serial.println(message);
   // aqui escreve no cartao
