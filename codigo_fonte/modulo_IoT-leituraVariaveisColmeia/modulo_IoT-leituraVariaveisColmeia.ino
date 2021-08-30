@@ -4,12 +4,21 @@
 #include <LiquidCrystal.h> // liquid cristal.
 #include <SD.h>
 #include <SPI.h>
+#include <Adafruit_Sensor.h>    
+#include <DHT.h>
+#include <DHT_U.h>
 
 
 // definicao dos pinos
 #define  pinoGas   A2   
 #define pinoSensorMovimento 9
 #define pinoSD  10
+#define DHTPIN 2  
+#define DHTTYPE      DHT22 
+
+DHT_Unified dht(DHTPIN, DHTTYPE);    
+sensor_t sensor;
+
 
 unsigned long contadorAbelha = 0;
 bool s_high=0;
@@ -21,6 +30,7 @@ bool s_high=0;
 //DallasTemperature sensor(&oneWire); // Informa a referencia da biblioteca dallas temperature para Biblioteca onewire
 DeviceAddress endereco_temp; // Cria um endereco temporario da leitura do sensor
 File myFile;
+
 
 // variaveis diversas.
 int TIME_DELAY = 100;
@@ -39,7 +49,7 @@ void setup() {
     Serial.println("Falha na inicialização do SD Card.");
     return;
   }
-
+  dht.begin();   
   Serial.println("Setup config OK");  
   processaLeituraEscritaSensores();  
 
@@ -58,8 +68,10 @@ void loop() {
   processaContadorAbelhas();
   
   delay(TIME_DELAY);
-
+ 
 }
+
+
 
 void processaContadorAbelhas(){
   bool movimento = digitalRead(pinoSensorMovimento);
@@ -76,19 +88,27 @@ void processaContadorAbelhas(){
 
 void processaLeituraEscritaSensores(){
     int  gas = analogRead(pinoGas);   
-    String valores = criaStringValoresSensores(contadorAbelha,gas);
+    sensors_event_t event;                      
+    dht.temperature().getEvent(&event);           
+    float temperatura = event.temperature;  
+    float humidade = dht.humidity().getEvent(&event);                  
+    String valores = criaStringValoresSensores(contadorAbelha,gas,temperatura,humidade);
+
     escreveCartao(valores);
     Serial.println("processaLeituraEscritaSensores: " + valores);
 }
 
 // valores: contador;gas
-String criaStringValoresSensores(int contador,int gas){
+String criaStringValoresSensores(int contador,int gas,float temperatura, float humidade ){
   String token = ";";
   String message = "";
   message.concat(String(gas));    
   message.concat(String(token));    
   message.concat(String(contador));
   message.concat(String(token));          
+  message.concat(String(temperatura));          
+  message.concat(String(token));          
+  message.concat(String(humidade));          
   return message;     
 }
 
@@ -108,7 +128,7 @@ void escreveCartao(String valor){
 void setupPinos(){
   pinMode(pinoGas, INPUT);
   pinMode(pinoSensorMovimento,INPUT);  
-  pinMode(pinoSD, OUTPUT); 
+  pinMode(pinoSD, OUTPUT);   
 
   digitalWrite(pinoSensorMovimento,LOW); 
 }
