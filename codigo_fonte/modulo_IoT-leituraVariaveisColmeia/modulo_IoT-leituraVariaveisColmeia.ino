@@ -88,10 +88,13 @@ void processaContadorAbelhas(){
 
 void processaLeituraEscritaSensores(){
     int  gas = analogRead(pinoGas);   
+    // parte de leitura de temperatura e humidade.
     sensors_event_t event;                      
     dht.temperature().getEvent(&event);           
     float temperatura = event.temperature;  
-    float humidade = dht.humidity().getEvent(&event);                  
+    dht.humidity().getEvent(&event);    
+    float humidade= event.relative_humidity;    
+    
     String valores = criaStringValoresSensores(contadorAbelha,gas,temperatura,humidade);
 
     escreveCartao(valores);
