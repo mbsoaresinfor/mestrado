@@ -8,34 +8,28 @@
 #include <DHT.h>
 #include <DHT_U.h>
 
-
 // definicao dos pinos
 #define  pinoGas   A2   
 #define pinoSensorMovimento 9
 #define pinoSD  10
-#define DHTPIN 2  
+#define pinoSensorTemperatura 2  
+
+// outros define
 #define DHTTYPE      DHT22 
-
-DHT_Unified dht(DHTPIN, DHTTYPE);    
-sensor_t sensor;
-
-
-unsigned long contadorAbelha = 0;
-bool s_high=0;
-
 #define NOME_ARQUIVO_DATA_SET  "dataset.txt"
 
 // objetos.
-//OneWire oneWire(sensorTemperaturaPin); // Cria um objeto OneWire
-//DallasTemperature sensor(&oneWire); // Informa a referencia da biblioteca dallas temperature para Biblioteca onewire
-DeviceAddress endereco_temp; // Cria um endereco temporario da leitura do sensor
+DHT_Unified dht(pinoSensorTemperatura, DHTTYPE);    
+sensor_t sensor;
 File myFile;
 
-
 // variaveis diversas.
+unsigned long contadorAbelha = 0;
+unsigned long contadorLoopParaLeitura = 0;
+unsigned long UM_MINUTO = 10 * 60; 
 int TIME_DELAY = 100;
-int UM_MINUTO = 10 * 60; 
-int contadorLoopParaLeitura = 0;
+bool s_high=0;
+
 
 
 void setup() {
@@ -146,26 +140,4 @@ void digitalWrite(int pin, int status, String texto){
   }
 }
 
-
-
-//float leituraSensorTemperatura(){
-//  float temperatura = 0;
-//  sensor.requestTemperatures(); // Envia comando para realizar a conversão de temperatura
-//  if (!sensor.getAddress(endereco_temp,0)) { // Encontra o endereco do sensor no barramento
-//    Serial.println("SENSOR TEMPERATURA NAO CONECTADO"); // Sensor conectado, imprime mensagem de erro   
-//  } else {    
-//    temperatura = sensor.getTempC(endereco_temp);
-//    String message = "Temperatura: ";
-//    message.concat(String(temperatura));
-//    message.concat(" C");
-//    
-//  }
-//  return temperatura;
-//}
-
-
-
-//void setupSensorTemperatura(){
-//  //sensor.begin();  // Inicia o sensor temperatura
-//}
   
