@@ -13,6 +13,8 @@
 #define pinoSensorMovimento 9
 #define pinoSD  10
 #define pinoSensorTemperatura 2  
+#define pinoSensorSom  A4
+
 
 // outros define
 #define DHTTYPE      DHT22 
@@ -88,15 +90,16 @@ void processaLeituraEscritaSensores(){
     float temperatura = event.temperature;  
     dht.humidity().getEvent(&event);    
     float humidade= event.relative_humidity;    
+    int som = analogRead(pinoSensorSom);
     
-    String valores = criaStringValoresSensores(contadorAbelha,gas,temperatura,humidade);
+    String valores = criaStringValoresSensores(contadorAbelha,gas,temperatura,humidade,som);
 
     escreveCartao(valores);
     Serial.println("processaLeituraEscritaSensores: " + valores);
 }
 
 // valores: contador;gas
-String criaStringValoresSensores(int contador,int gas,float temperatura, float humidade ){
+String criaStringValoresSensores(int contador,int gas,float temperatura, float humidade,int som ){
   String token = ";";
   String message = "";
   message.concat(String(gas));    
@@ -105,7 +108,9 @@ String criaStringValoresSensores(int contador,int gas,float temperatura, float h
   message.concat(String(token));          
   message.concat(String(temperatura));          
   message.concat(String(token));          
-  message.concat(String(humidade));          
+  message.concat(String(humidade));       
+  message.concat(String(token));          
+  message.concat(String(som));             
   return message;     
 }
 
@@ -126,6 +131,7 @@ void setupPinos(){
   pinMode(pinoGas, INPUT);
   pinMode(pinoSensorMovimento,INPUT);  
   pinMode(pinoSD, OUTPUT);   
+  pinMode(pinoSensorSom, INPUT); 
 
   digitalWrite(pinoSensorMovimento,LOW); 
 }
