@@ -71,6 +71,7 @@ void loop() {
 }
 
 // armazena o maior som lido das abelhas.
+// valor de calibração do sensor: 486 a 487
 void processaMaiorSomAbelhas(){
   int somLido = analogRead(pinoSensorSom);   
   if(somLido > maiorSom){
