@@ -31,6 +31,7 @@ unsigned long contadorLoopParaLeitura = 0;
 unsigned long UM_MINUTO = 10 * 60; 
 int TIME_DELAY = 100;
 bool s_high=0;
+int maiorSom = 0;
 
 
 
@@ -57,17 +58,27 @@ void loop() {
   if(contadorLoopParaLeitura == UM_MINUTO){
       processaLeituraEscritaSensores();
       contadorLoopParaLeitura = 0;
+      maiorSom = 0;
   }else{
      contadorLoopParaLeitura++;
+     processaMaiorSomAbelhas();
   }
   
-  processaContadorAbelhas();
+  processaContadorAbelhas();  
   
   delay(TIME_DELAY);
  
 }
 
-
+// armazena o maior som lido das abelhas.
+void processaMaiorSomAbelhas(){
+  int somLido = analogRead(pinoSensorSom);   
+  if(somLido > maiorSom){
+    maiorSom = somLido;
+     Serial.print("setado maior som: ");
+     Serial.println(maiorSom);
+  }
+}
 
 void processaContadorAbelhas(){
   bool movimento = digitalRead(pinoSensorMovimento);
@@ -89,10 +100,9 @@ void processaLeituraEscritaSensores(){
     dht.temperature().getEvent(&event);           
     float temperatura = event.temperature;  
     dht.humidity().getEvent(&event);    
-    float humidade= event.relative_humidity;    
-    int som = analogRead(pinoSensorSom);
+    float humidade= event.relative_humidity;        
     
-    String valores = criaStringValoresSensores(contadorAbelha,gas,temperatura,humidade,som);
+    String valores = criaStringValoresSensores(contadorAbelha,gas,temperatura,humidade,maiorSom);
 
     escreveCartao(valores);
     Serial.println("processaLeituraEscritaSensores: " + valores);
