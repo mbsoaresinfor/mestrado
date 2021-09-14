@@ -1,7 +1,5 @@
 #include <OneWire.h> // sensor temperatura
 #include <DallasTemperature.h> // sensor temperatura
-#include <Servo.h> // servo
-#include <LiquidCrystal.h> // liquid cristal.
 #include <SD.h>
 #include <SPI.h>
 #include <Adafruit_Sensor.h>    
