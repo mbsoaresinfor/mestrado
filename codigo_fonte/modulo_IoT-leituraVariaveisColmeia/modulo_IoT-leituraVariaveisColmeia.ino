@@ -26,8 +26,9 @@ File myFile;
 // variaveis diversas.
 unsigned long contadorAbelha = 0;
 unsigned long contadorLoopParaLeitura = 0;
-unsigned long UM_MINUTO = 10 * 60; 
-int TIME_DELAY = 100;
+int TEMPO_DELAY = 100;
+unsigned long UM_SEGUNDO = ((TEMPO_DELAY * 10)/ 1000);
+unsigned long CINCO_MINUTO = (UM_SEGUNDO * 60 * 5) ; 
 bool s_high=0;
 int maiorSom = 0;
 
@@ -45,6 +46,11 @@ void setup() {
     return;
   }
   dht.begin();   
+  Serial.println("Valores dos contadores de tempo");
+  Serial.print("UM_SEGUNDO: ");
+  Serial.println(UM_SEGUNDO);  
+  Serial.print("CINCO_MINUTO: ");
+  Serial.println(CINCO_MINUTO);  
   Serial.println("Setup config OK");  
   processaLeituraEscritaSensores();  
 
@@ -53,7 +59,7 @@ void setup() {
 // TODO tirar todos os print de log, 
 void loop() {
 
-  if(contadorLoopParaLeitura == UM_MINUTO){
+  if(contadorLoopParaLeitura == CINCO_MINUTO){
       processaLeituraEscritaSensores();
       contadorLoopParaLeitura = 0;
       maiorSom = 0;
@@ -64,7 +70,7 @@ void loop() {
   
   processaContadorAbelhas();  
   
-  delay(TIME_DELAY);
+  delay(TEMPO_DELAY);
  
 }
 
@@ -104,7 +110,9 @@ void processaLeituraEscritaSensores(){
     String valores = criaStringValoresSensores(contadorAbelha,gas,temperatura,humidade,maiorSom);
 
     escreveCartao(valores);
-    Serial.println("processaLeituraEscritaSensores: " + valores);
+    Serial.println("processaLeituraEscritaSensores: " );
+    Serial.println("contadorAbelha,gas,temperatura,humidade,maiorSom");
+    Serial.println(valores);
 }
 
 // valores: contador;gas
