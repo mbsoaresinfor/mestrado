@@ -10,7 +10,7 @@
 #define pinoSD  10
 #define pinoSensorTemperatura 2  
 #define pinoSensorSom  A4
-#define TAM_VETOR  16
+#define TAM_VETOR  14
 
 
 // outros define
@@ -35,16 +35,7 @@ long contadorAbelha = 0;
 String vetor[TAM_VETOR];
 byte indiceVetor = 0;
 
-void testeVetores(){  
-  for (int i = 0; i < 10; i++) {
-    vetor[i] = criaLinhaValoresSensores(1,2,3,4,5);
-  }
 
-  for (int i = 0; i < 15; i++) {    
-    Serial.println(vetor[i]);
-    delay(500);
-  }
-}
 
 void setup() {
   Serial.begin(9600);   
@@ -124,8 +115,8 @@ void processaMaiorGas(){
   int  gasLido = analogRead(pinoGas);   
   if(gasLido > maiorGas){
     maiorGas = gasLido;
-    Serial.print("setado maior gas: ");     
-    Serial.println(maiorGas);
+    //Serial.print("setado maior gas: ");     
+    //Serial.println(maiorGas);
   }
 }
 
@@ -135,8 +126,8 @@ void processaMaiorSomAbelhas(){
   int somLido = analogRead(pinoSensorSom);   
   if(somLido > maiorSom){
     maiorSom = somLido;
-    Serial.print("setado maior som: ");     
-    Serial.println(maiorSom);
+    //Serial.print("setado maior som: ");     
+    //Serial.println(maiorSom);
   }
 }
 
