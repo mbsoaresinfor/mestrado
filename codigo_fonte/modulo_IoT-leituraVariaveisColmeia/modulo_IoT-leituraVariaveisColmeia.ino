@@ -10,7 +10,7 @@
 #define pinoSD  10
 #define pinoSensorTemperatura 2  
 #define pinoSensorSom  A4
-#define TAM_VETOR  14
+#define TAM_VETOR  5
 
 
 // outros define
@@ -55,11 +55,11 @@ void setup() {
   Serial.print("UM_MINUTO: ");
   Serial.println(UM_MINUTO);  
 
+  
   Serial.println("Fazendo primeiro leitura dos sensores e salvando");  
   processaLeituraTodosSensores();
   adicionaValoresVetor();
   escreveCartaoEfazProcessamentoVetorAposEscreveCartao(vetor);
-
   Serial.println("Setup config OK"); 
 }
 
@@ -70,7 +70,7 @@ void loop() {
   bool eUmMinuto = ((contadorLoopParaLeitura % UM_MINUTO) == 0) && contadorLoopParaLeitura != 0;
   bool eCincoMinuto = ((contadorLoopParaLeitura % (UM_MINUTO * 5)) == 0) && contadorLoopParaLeitura != 0;
   bool eDezMinuto =  ((contadorLoopParaLeitura % (UM_MINUTO * 10)) == 0) && contadorLoopParaLeitura != 0;
-  bool eSessentaMinuto = ((contadorLoopParaLeitura % (UM_MINUTO * 60l)) == 0) && contadorLoopParaLeitura != 0;
+  bool eQuinzeMinuto = ((contadorLoopParaLeitura % (UM_MINUTO * 15)) == 0) && contadorLoopParaLeitura != 0;
 
   if(eUmMinuto){
     Serial.println("processando operacoes de cada 1 minuto");
@@ -84,14 +84,13 @@ void loop() {
   
   if(eDezMinuto){
     Serial.println("processando operacoes de cada 10 minutos");
-    processaLeituraTemperaturaHumidade();
+    processaLeituraTemperaturaHumidade();    
   } 
 
-  if(eSessentaMinuto){
-    Serial.println("processando operacoes de cada 60 minutos");
+  if(eQuinzeMinuto){
+    Serial.println("processando operacoes de cada 15 minutos");
     escreveCartaoEfazProcessamentoVetorAposEscreveCartao(vetor);
-    contadorLoopParaLeitura = 0;
-    
+    contadorLoopParaLeitura = 0;    
   }
   
   processaMaiorSomAbelhas();
@@ -102,11 +101,11 @@ void loop() {
  
 }
 
-void processaLeituraTodosSensores(){
-  processaLeituraTemperaturaHumidade();
+void processaLeituraTodosSensores(){  
   processaMaiorGas();
   processaMaiorSomAbelhas();
   processaContadorAbelhas();  
+  processaLeituraTemperaturaHumidade();
 }
 
 
@@ -174,16 +173,16 @@ String criaLinhaValoresSensores(int contador,int gas,float temperatura, float hu
 
   String token = ";";
   String message = "";
-  message.concat(String(contador));
-  message.concat(String(token));    
-  message.concat(String(gas));    
-  message.concat(String(token));          
-  message.concat(String(temperatura));          
-  message.concat(String(token));          
-  message.concat(String(humidade));       
-  message.concat(String(token));          
-  message.concat(String(som));             
-  message.concat(String("\n"));       
+  message.concat(contador);
+  message.concat(token);    
+  message.concat(gas);    
+  message.concat(token);          
+  message.concat(temperatura);          
+  message.concat(token);          
+  message.concat(humidade);       
+  message.concat(token);          
+  message.concat(som);             
+  message.concat("\n");       
   return message;     
 }
 
@@ -193,9 +192,9 @@ void escreveCartaoEfazProcessamentoVetorAposEscreveCartao(String valor[]){
 }
 
 void fazProcessamentoVetorAposEscreveCartao(String valor[]){
-  for(int i=0; i < TAM_VETOR; i++){
-      valor[i] = '\0';      
-  }
+  //for(int i=0; i < TAM_VETOR; i++){
+  //    valor[i] = '\0';      
+ // }
   indiceVetor = 0;
 }
 
