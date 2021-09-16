@@ -1,6 +1,5 @@
 #include <SD.h>
-#include <SPI.h>
-//#include <Adafruit_Sensor.h>    
+#include <SPI.h> 
 #include <DHT.h>
 #include <DHT_U.h>
 
@@ -24,17 +23,15 @@ DHT_Unified dht(pinoSensorTemperatura, DHTTYPE);
 // variaveis diversas.
 unsigned long contadorLoopParaLeitura = 0;
 byte TEMPO_DELAY  = 100;
-byte UM_SEGUNDO = ((TEMPO_DELAY / 10));
-short UM_MINUTO = (UM_SEGUNDO * 60) ; 
+byte UM_SEGUNDO = ((TEMPO_DELAY / 10)); // representa a quantidade de loops 
+short UM_MINUTO = (UM_SEGUNDO * 60) ; // representa a quantidade de loops 
 bool s_high=0;
 short maiorSom = 0;
 short maiorGas = 0;
 float temperatura = 0;
 float humidade = 0;
 long contadorAbelha = 0;
-String vetor[TAM_VETOR];
-byte indiceVetor = 0;
-
+String valores = "";
 
 
 void setup() {
@@ -49,18 +46,17 @@ void setup() {
     return;
   }
   dht.begin();   
-  Serial.println("Valores dos contadores de tempo");
-  Serial.print("UM_SEGUNDO: ");
-  Serial.println(UM_SEGUNDO);  
-  Serial.print("UM_MINUTO: ");
-  Serial.println(UM_MINUTO);  
-
+  Serial.println("Valores dos contadores de tempo:");
+  Serial.print(UM_SEGUNDO);  
+  Serial.println(" CICLOS = UM SEGUNDO");
+  Serial.print(UM_MINUTO);  
+  Serial.println(" CICLOS = UM MINUTO: ");
   
   Serial.println("Fazendo primeiro leitura dos sensores e salvando");  
   processaLeituraTodosSensores();
   adicionaValoresVetor();
-  escreveCartaoEfazProcessamentoVetorAposEscreveCartao(vetor);
-  Serial.println("Setup config OK"); 
+  escreveCartao(valores);
+  Serial.println("Setup OK"); 
 }
 
 
@@ -73,23 +69,24 @@ void loop() {
   bool eQuinzeMinuto = ((contadorLoopParaLeitura % (UM_MINUTO * 15)) == 0) && contadorLoopParaLeitura != 0;
 
   if(eUmMinuto){
-    Serial.println("processando operacoes de cada 1 minuto");
+    Serial.println("processando operacoes por 1 minuto");
     processaMaiorGas();
+    Serial.println(valores);
   }
 
   if(eCincoMinuto){
-      Serial.println("processando operacoes de cada 5 minutos");           
+      Serial.println("processando operacoes por 5 minutos");           
       adicionaValoresVetor();
   }
   
   if(eDezMinuto){
-    Serial.println("processando operacoes de cada 10 minutos");
+    Serial.println("processando operacoes por 10 minutos");
     processaLeituraTemperaturaHumidade();    
   } 
 
   if(eQuinzeMinuto){
-    Serial.println("processando operacoes de cada 15 minutos");
-    escreveCartaoEfazProcessamentoVetorAposEscreveCartao(vetor);
+    Serial.println("processando operacoes por 15 minutos");
+    escreveCartao(valores);
     contadorLoopParaLeitura = 0;    
   }
   
@@ -143,8 +140,8 @@ void processaContadorAbelhas(){
   }
 }
 
+// parte de leitura de temperatura e humidade.
 void processaLeituraTemperaturaHumidade(){
-    // parte de leitura de temperatura e humidade.
     sensors_event_t event;                      
     dht.temperature().getEvent(&event);           
      temperatura = event.temperature;  
@@ -152,15 +149,11 @@ void processaLeituraTemperaturaHumidade(){
     humidade= event.relative_humidity;      
 }
 
-void adicionaValoresVetor(){
-    
+void adicionaValoresVetor(){    
     String valorAtualLido = criaLinhaValoresSensores(contadorAbelha,maiorGas,temperatura,humidade,maiorSom);
-    vetor[indiceVetor] = valorAtualLido;
-    indiceVetor++;
-    limpaVariaveisSensores();
-    Serial.print("valorAtualLido:");
-    Serial.println(valorAtualLido);
-    
+    Serial.println("valorAtualLido: " + valorAtualLido);
+    valores += valorAtualLido;    
+    limpaVariaveisSensores();    
 }
 
 void limpaVariaveisSensores(){
@@ -186,27 +179,17 @@ String criaLinhaValoresSensores(int contador,int gas,float temperatura, float hu
   return message;     
 }
 
-void escreveCartaoEfazProcessamentoVetorAposEscreveCartao(String valor[]){
-  escreveCartao(valor);
-  fazProcessamentoVetorAposEscreveCartao(valor);
-}
 
-void fazProcessamentoVetorAposEscreveCartao(String valor[]){
-  //for(int i=0; i < TAM_VETOR; i++){
-  //    valor[i] = '\0';      
- // }
-  indiceVetor = 0;
-}
 
-void escreveCartao(String valor[]){
-  Serial.println("escrevendo no arquivo");  
+
+void escreveCartao(String valor){
+  Serial.println("Escrevendo no arquivo");  
   File myFile = SD.open(NOME_ARQUIVO_DATA_SET, FILE_WRITE);  
-  if (myFile) {     
-    for(int i=0; i < indiceVetor; i++){
-      Serial.print(valor[i]);
-      myFile.println(valor[i]); 
-    }
-    myFile.close();     
+  if (myFile) {         
+      Serial.print(valor);
+      myFile.println(valor);     
+      myFile.close();  
+      valores = "";   
   }  
 }
 
@@ -216,7 +199,6 @@ void setupPinos(){
   pinMode(pinoSensorMovimento,INPUT);  
   pinMode(pinoSD, OUTPUT);   
   pinMode(pinoSensorSom, INPUT); 
-
   digitalWrite(pinoSensorMovimento,LOW); 
 }
 
