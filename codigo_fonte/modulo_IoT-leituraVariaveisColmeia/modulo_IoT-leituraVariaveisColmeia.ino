@@ -2,6 +2,7 @@
 #include <SPI.h> 
 #include <DHT.h>
 #include <DHT_U.h>
+#include "HX711.h"                    
 
 // definicao dos pinos
 #define  pinoGas   A2   
@@ -9,6 +10,8 @@
 #define pinoSD  10
 #define pinoSensorTemperatura 2  
 #define pinoSensorSom  A4
+#define pinoBalancaDOUT 3                      
+#define pinoBalancaCLK  4  
 #define TAM_VETOR  5
 
 
@@ -18,7 +21,7 @@
 
 // objetos.
 DHT_Unified dht(pinoSensorTemperatura, DHTTYPE);    
-
+HX711 balanca;             
 
 // variaveis diversas.
 unsigned long contadorLoopParaLeitura = 0;
@@ -32,6 +35,8 @@ float temperatura = 0;
 float humidade = 0;
 long contadorAbelha = 0;
 String valores = "";
+float peso = 0;
+float calibration_factor = -22130;     // fator de calibração aferido na Calibração 
 
 
 void setup() {
@@ -46,6 +51,7 @@ void setup() {
     return;
   }
   dht.begin();   
+  configuraBalanca();
   Serial.println("Valores dos contadores de tempo:");
   Serial.print(UM_SEGUNDO);  
   Serial.println(" CICLOS = UM SEGUNDO");
@@ -60,6 +66,7 @@ void setup() {
 }
 
 
+
 // TODO tirar todos os print de log, 
 void loop() {
 
@@ -67,6 +74,7 @@ void loop() {
   bool eCincoMinuto = ((contadorLoopParaLeitura % (UM_MINUTO * 5)) == 0) && contadorLoopParaLeitura != 0;
   bool eDezMinuto =  ((contadorLoopParaLeitura % (UM_MINUTO * 10)) == 0) && contadorLoopParaLeitura != 0;
   bool eQuinzeMinuto = ((contadorLoopParaLeitura % (UM_MINUTO * 15)) == 0) && contadorLoopParaLeitura != 0;
+
 
   if(eUmMinuto){
     Serial.println("processando operacoes por 1 minuto");
@@ -86,6 +94,7 @@ void loop() {
 
   if(eQuinzeMinuto){
     Serial.println("processando operacoes por 15 minutos");
+    processaLeituraBalanca();
     escreveCartao(valores);
     contadorLoopParaLeitura = 0;    
   }
@@ -98,21 +107,30 @@ void loop() {
  
 }
 
+void configuraBalanca(){
+  Serial.println("Configurando balança");
+  balanca.begin(pinoBalancaDOUT, pinoBalancaCLK);   
+  balanca.set_scale(calibration_factor);            
+  balanca.tare();                                   
+}
+
 void processaLeituraTodosSensores(){  
   processaMaiorGas();
   processaMaiorSomAbelhas();
   processaContadorAbelhas();  
   processaLeituraTemperaturaHumidade();
+  processaLeituraBalanca();
 }
 
+void processaLeituraBalanca(){
+  peso = balanca.get_units();
+}
 
 // armazena o maior gas lido
 void processaMaiorGas(){
   int  gasLido = analogRead(pinoGas);   
   if(gasLido > maiorGas){
-    maiorGas = gasLido;
-    //Serial.print("setado maior gas: ");     
-    //Serial.println(maiorGas);
+    maiorGas = gasLido;    
   }
 }
 
@@ -121,9 +139,7 @@ void processaMaiorGas(){
 void processaMaiorSomAbelhas(){
   int somLido = analogRead(pinoSensorSom);   
   if(somLido > maiorSom){
-    maiorSom = somLido;
-    //Serial.print("setado maior som: ");     
-    //Serial.println(maiorSom);
+    maiorSom = somLido;    
   }
 }
 
@@ -150,7 +166,7 @@ void processaLeituraTemperaturaHumidade(){
 }
 
 void adicionaValoresVetor(){    
-    String valorAtualLido = criaLinhaValoresSensores(contadorAbelha,maiorGas,temperatura,humidade,maiorSom);
+    String valorAtualLido = criaLinhaValoresSensores(contadorAbelha,maiorGas,temperatura,humidade,maiorSom,peso);
     Serial.println("valorAtualLido: " + valorAtualLido);
     valores += valorAtualLido;    
     limpaVariaveisSensores();    
@@ -162,7 +178,7 @@ void limpaVariaveisSensores(){
 }
 
 
-String criaLinhaValoresSensores(int contador,int gas,float temperatura, float humidade,int som ){
+String criaLinhaValoresSensores(int contador,int gas,float temperatura, float humidade,int som,float peso ){
 
   String token = ";";
   String message = "";
@@ -174,11 +190,16 @@ String criaLinhaValoresSensores(int contador,int gas,float temperatura, float hu
   message.concat(token);          
   message.concat(humidade);       
   message.concat(token);          
-  message.concat(som);             
+  message.concat(som);        
+  message.concat(token);
+  message.concat( formataPeso(peso));       
   message.concat("\n");       
   return message;     
 }
 
+String formataPeso(float peso){   
+   return   String(peso, 3);
+}
 
 
 
