@@ -72,7 +72,6 @@ void loop() {
 
   bool eUmMinuto = ((contadorLoopParaLeitura % UM_MINUTO) == 0) && contadorLoopParaLeitura != 0;
   bool eCincoMinuto = ((contadorLoopParaLeitura % (UM_MINUTO * 5)) == 0) && contadorLoopParaLeitura != 0;
-  bool eDezMinuto =  ((contadorLoopParaLeitura % (UM_MINUTO * 10)) == 0) && contadorLoopParaLeitura != 0;
   bool eQuinzeMinuto = ((contadorLoopParaLeitura % (UM_MINUTO * 15)) == 0) && contadorLoopParaLeitura != 0;
 
 
@@ -84,17 +83,13 @@ void loop() {
 
   if(eCincoMinuto){
       Serial.println("processando operacoes por 5 minutos");           
-      adicionaValoresVetor();
+     processaLeituraTemperaturaHumidade();    
+     processaLeituraBalanca();
+     adicionaValoresVetor();
   }
-  
-  if(eDezMinuto){
-    Serial.println("processando operacoes por 10 minutos");
-    processaLeituraTemperaturaHumidade();    
-  } 
 
   if(eQuinzeMinuto){
-    Serial.println("processando operacoes por 15 minutos");
-    processaLeituraBalanca();
+    Serial.println("processando operacoes por 15 minutos");    
     escreveCartao(valores);
     contadorLoopParaLeitura = 0;    
   }
