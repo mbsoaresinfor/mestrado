@@ -82,12 +82,12 @@ void loop() {
   }
 
   if(eCincoMinuto){
-      Serial.println("processando operacoes por 5 minutos");           
+     Serial.println("processando operacoes por 5 minutos");           
      processaLeituraTemperaturaHumidade();    
      processaLeituraBalanca();
-     adicionaValoresVetor();
+     adicionaValoresVetor(); 
   }
-
+ 
   if(eQuinzeMinuto){
     Serial.println("processando operacoes por 15 minutos");    
     escreveCartao(valores);
@@ -162,7 +162,7 @@ void processaLeituraTemperaturaHumidade(){
 
 void adicionaValoresVetor(){    
     String valorAtualLido = criaLinhaValoresSensores(contadorAbelha,maiorGas,temperatura,humidade,maiorSom,peso);
-    Serial.println("valorAtualLido: " + valorAtualLido);
+    Serial.println("valores lidos agora:  " + valorAtualLido);
     valores += valorAtualLido;    
     limpaVariaveisSensores();    
 }
@@ -199,14 +199,15 @@ String formataPeso(float peso){
 
 
 void escreveCartao(String valor){
-  Serial.println("Escrevendo no arquivo");  
+  
   File myFile = SD.open(NOME_ARQUIVO_DATA_SET, FILE_WRITE);  
   if (myFile) {         
+      Serial.println("Escrevendo no arquivo");  
       Serial.print(valor);
       myFile.println(valor);     
-      myFile.close();  
-      valores = "";   
+      myFile.close();        
   }  
+  valores = "";   
 }
 
 
