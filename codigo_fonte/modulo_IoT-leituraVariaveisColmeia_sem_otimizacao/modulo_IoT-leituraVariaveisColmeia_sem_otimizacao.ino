@@ -1,7 +1,7 @@
 /**
  * Desenvolvido por: Marcelo Barbosa Soares
  * Data: 11/10/2021
- * Para o trabalho de dissertação do curso de Mestrado em informatica Aplicada, pela Universidade Unisinos - RS - Brasil 
+ * Para o trabalho de dissertacao do curso de Mestrado em informatica Aplicada, pela Universidade Unisinos - RS - Brasil 
  */
 
 #include <SD.h>
@@ -30,16 +30,16 @@ DHT_Unified dht(pinoSensorTemperatura, DHTTYPE);
 HX711 balanca;             
 
 // variaveis diversas.
-byte TEMPO_DELAY  = 100;
+int TEMPO_DELAY  = 1000;
 bool s_high=0;
-short maiorSom = 0;
-short maiorGas = 0;
+short som = 0;
+short gas = 0;
 float temperatura = 0;
 float humidade = 0;
 long contadorAbelha = 0;
 String valores = "";
 float peso = 0;
-float calibration_factor = -22130;     // fator de calibração aferido na Calibração 
+float calibration_factor = -22130;     
 
 
 void setup() {
@@ -50,7 +50,7 @@ void setup() {
   if (SD.begin()) { 
     Serial.println("SD Card pronto para uso.");     
   } else {
-    Serial.println("Falha na inicialização do SD Card.");
+    Serial.println("Falha na inicializacao do SD Card.");
     return;
   }
   dht.begin();   
@@ -78,7 +78,7 @@ void loop() {
 }
 
 void configuraBalanca(){
-  Serial.println("Configurando balança");
+  Serial.println("Configurando balanca");
   balanca.begin(pinoBalancaDOUT, pinoBalancaCLK);   
   balanca.set_scale(calibration_factor);            
   balanca.tare();                                   
@@ -96,21 +96,13 @@ void processaLeituraBalanca(){
   peso = balanca.get_units();
 }
 
-// armazena o maior gas lido
+
 void processaMaiorGas(){
-  int  gasLido = analogRead(pinoGas);   
-  if(gasLido > maiorGas){
-    maiorGas = gasLido;    
-  }
+  gas = analogRead(pinoGas);     
 }
 
-// armazena o maior som lido das abelhas.
-// valor de calibração do sensor: 486 a 487
 void processaMaiorSomAbelhas(){
-  int somLido = analogRead(pinoSensorSom);   
-  if(somLido > maiorSom){
-    maiorSom = somLido;    
-  }
+  som = analogRead(pinoSensorSom);     
 }
 
 void processaContadorAbelhas(){
@@ -121,12 +113,11 @@ void processaContadorAbelhas(){
 
   if(!movimento && s_high){
     s_high =0;
-    contadorAbelha+=1;
-    Serial.println(contadorAbelha); // TODO DEPOIS TIRAR ESTE LOG.
+    contadorAbelha+=1;   
   }
 }
 
-// parte de leitura de temperatura e humidade.
+
 void processaLeituraTemperaturaHumidade(){
     sensors_event_t event;                      
     dht.temperature().getEvent(&event);           
@@ -136,16 +127,11 @@ void processaLeituraTemperaturaHumidade(){
 }
 
 void adicionaValoresVetor(){    
-    String valorAtualLido = criaLinhaValoresSensores(contadorAbelha,maiorGas,temperatura,humidade,maiorSom,peso);
+    String valorAtualLido = criaLinhaValoresSensores(contadorAbelha,gas,temperatura,humidade,som,peso);
     Serial.println("valores lidos agora:  " + valorAtualLido);
-    valores += valorAtualLido;    
-    limpaVariaveisSensores();    
+    valores += valorAtualLido;        
 }
 
-void limpaVariaveisSensores(){
-    maiorSom = 0;
-    maiorGas = 0;
-}
 
 
 String criaLinhaValoresSensores(int contador,int gas,float temperatura, float humidade,int som,float peso ){
@@ -170,8 +156,6 @@ String criaLinhaValoresSensores(int contador,int gas,float temperatura, float hu
 String formataPeso(float peso){   
    return   String(peso, 3);
 }
-
-
 
 void escreveCartao(String valor){
   
