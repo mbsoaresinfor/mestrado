@@ -12,6 +12,7 @@
 #define pinoSensorSom  A4
 #define pinoBalancaDOUT 3                      
 #define pinoBalancaCLK  4  
+#define pinoBuzzer  5  
 #define TAM_VETOR  5
 
 
@@ -48,6 +49,7 @@ void setup() {
     Serial.println("SD Card pronto para uso.");     
   } else {
     Serial.println("Falha na inicialização do SD Card.");
+    ligaBuzzer(-1);
     return;
   }
   dht.begin();   
@@ -85,6 +87,7 @@ void loop() {
      Serial.println("processando operacoes por 5 minutos");           
      processaLeituraTemperaturaHumidade();    
      processaLeituraBalanca();
+     validaPeso();
      adicionaValoresVetor(); 
   }
  
@@ -196,7 +199,11 @@ String formataPeso(float peso){
    return   String(peso, 3);
 }
 
-
+void validaPeso(){  
+  if(peso < 1){
+    ligaBuzzer(-1);
+  }
+}
 
 void escreveCartao(String valor){
   
@@ -206,7 +213,9 @@ void escreveCartao(String valor){
       Serial.print(valor);
       myFile.println(valor);     
       myFile.close();        
-  }  
+  }else{
+      ligaBuzzer(-1);
+  }
   valores = "";   
 }
 
@@ -217,8 +226,18 @@ void setupPinos(){
   pinMode(pinoSD, OUTPUT);   
   pinMode(pinoSensorSom, INPUT); 
   digitalWrite(pinoSensorMovimento,LOW); 
+  pinMode(pinoBuzzer,OUTPUT);  
 }
 
+void ligaBuzzer(int tempo){
+  tone(pinoBuzzer,500);   
+  if(tempo != -1){
+    delay(tempo);     
+    noTone(pinoBuzzer);
+    delay(tempo);    
+  } 
+
+}
 
 
 void digitalWrite(int pin, int status, String texto){
