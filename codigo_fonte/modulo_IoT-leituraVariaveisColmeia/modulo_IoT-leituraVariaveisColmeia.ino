@@ -1,3 +1,11 @@
+/**
+ * Desenvolvido por: Marcelo Barbosa Soares
+ * E-mail: mbsoares.infor@gmail.com
+ * Data: 01/03/2021
+ * Dissertacao do curso de Mestrado em informatica Aplicada, pela Universidade Unisinos - RS - Brasil 
+ * Implementacao de leitura de sensores, com otimizações para enconomia de energia.
+ */
+
 #include <SD.h>
 #include <SPI.h> 
 #include <DHT.h>
