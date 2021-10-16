@@ -25,7 +25,7 @@
 
 
 // outros define
-#define DHTTYPE      DHT22 
+#define DHTTYPE      DHT11 
 #define NOME_ARQUIVO_DATA_SET  "dataset.txt"
 
 // objetos.
