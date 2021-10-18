@@ -26,7 +26,7 @@
 
 // outros define
 #define DHTTYPE      DHT11 
-#define NOME_ARQUIVO_DATA_SET  "dataset.txt"
+#define NOME_ARQUIVO_DATA_SET  "data.txt"
 
 // objetos.
 DHT_Unified dht(pinoSensorTemperatura, DHTTYPE);    
@@ -70,20 +70,18 @@ void setup() {
   
   Serial.println("Fazendo primeiro leitura dos sensores e salvando");  
   processaLeituraTodosSensores();
+  validaTemperaturaHumidade();
   adicionaValoresVetor();
   escreveCartao(valores);
   Serial.println("Setup OK"); 
 }
 
 
-
-// TODO tirar todos os print de log, 
 void loop() {
 
   bool eUmMinuto = ((contadorLoopParaLeitura % UM_MINUTO) == 0) && contadorLoopParaLeitura != 0;
   bool eCincoMinuto = ((contadorLoopParaLeitura % (UM_MINUTO * 5)) == 0) && contadorLoopParaLeitura != 0;
-  bool eQuinzeMinuto = ((contadorLoopParaLeitura % (UM_MINUTO * 15)) == 0) && contadorLoopParaLeitura != 0;
-
+  
 
   if(eUmMinuto){
     Serial.println("processando operacoes por 1 minuto");
@@ -96,15 +94,12 @@ void loop() {
      processaLeituraTemperaturaHumidade();    
      processaLeituraBalanca();
      validaPeso();
+     validaTemperaturaHumidade();
      adicionaValoresVetor(); 
+     escreveCartao(valores);
+     contadorLoopParaLeitura = 0;    
   }
  
-  if(eQuinzeMinuto){
-    Serial.println("processando operacoes por 15 minutos");    
-    escreveCartao(valores);
-    contadorLoopParaLeitura = 0;    
-  }
-  
   processaMaiorSomAbelhas();
   processaContadorAbelhas();  
   
@@ -113,8 +108,13 @@ void loop() {
  
 }
 
-void configuraBalanca(){
-  Serial.println("Configurando balança");
+void validaTemperaturaHumidade(){
+  if (isnan(temperatura) || isnan(humidade)) {
+    ligaBuzzer(-1);
+  }
+  
+}
+void configuraBalanca(){  
   balanca.begin(pinoBalancaDOUT, pinoBalancaCLK);   
   balanca.set_scale(calibration_factor);            
   balanca.tare();                                   
@@ -158,7 +158,7 @@ void processaContadorAbelhas(){
   if(!movimento && s_high){
     s_high =0;
     contadorAbelha+=1;
-    Serial.println(contadorAbelha); // TODO DEPOIS TIRAR ESTE LOG.
+    Serial.println(contadorAbelha); 
   }
 }
 
@@ -166,15 +166,13 @@ void processaContadorAbelhas(){
 void processaLeituraTemperaturaHumidade(){
     sensors_event_t event;                      
     dht.temperature().getEvent(&event);           
-     temperatura = event.temperature;  
+    temperatura = event.temperature;  
     dht.humidity().getEvent(&event);    
     humidade= event.relative_humidity;      
 }
 
 void adicionaValoresVetor(){    
-    String valorAtualLido = criaLinhaValoresSensores(contadorAbelha,maiorGas,temperatura,humidade,maiorSom,peso);
-    Serial.println("valores lidos agora:  " + valorAtualLido);
-    valores += valorAtualLido;    
+    valores = criaLinhaValoresSensores(contadorAbelha,maiorGas,temperatura,humidade,maiorSom,peso);
     limpaVariaveisSensores();    
 }
 
@@ -214,17 +212,21 @@ void validaPeso(){
 }
 
 void escreveCartao(String valor){
+  Serial.println("Preparando para escrever arquivo");  
   
   File myFile = SD.open(NOME_ARQUIVO_DATA_SET, FILE_WRITE);  
   if (myFile) {         
-      Serial.println("Escrevendo no arquivo");  
-      Serial.print(valor);
+      Serial.print("Arquivo aberto, escrevendo no arquivo: ");        
+      Serial.println(valor);
       myFile.println(valor);     
-      myFile.close();        
-  }else{
+      myFile.close();  
+  
+      valores = "";       
+  }else{  
+      Serial.println("Erro na escrita do arquivo");  
       ligaBuzzer(-1);
   }
-  valores = "";   
+  
 }
 
 
