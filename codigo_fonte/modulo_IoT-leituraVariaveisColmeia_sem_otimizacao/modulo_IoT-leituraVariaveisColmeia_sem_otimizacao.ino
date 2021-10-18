@@ -24,7 +24,7 @@
 
 // outros define
 #define DHTTYPE      DHT11 
-#define NOME_ARQUIVO_DATA_SET  "dataset.txt"
+#define NOME_ARQUIVO_DATA_SET  "data.txt"
 
 // objetos.
 DHT_Unified dht(pinoSensorTemperatura, DHTTYPE);    
