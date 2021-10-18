@@ -3,7 +3,7 @@
  * E-mail: mbsoares.infor@gmail.com
  * Data: 01/03/2021
  * Dissertacao do curso de Mestrado em informatica Aplicada, pela Universidade Unisinos - RS - Brasil 
- * Implementacao de leitura de sensores, com otimizações para enconomia de energia.
+ * Implementacao de leitura de sensores, com otimizações para economia de energia.
  */
 
 #include <SD.h>
