@@ -1,0 +1,1 @@
+Este projeto representa o componente back-end da camada de serviços.
