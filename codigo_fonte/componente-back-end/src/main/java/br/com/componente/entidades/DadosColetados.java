@@ -1,10 +1,12 @@
 package br.com.componente.entidades;
 
 
-public class DadosApiarioRequisicao {
+public class DadosColetados {
 
 
-	private Float tenantId;
+	private Float idTenant;
+	
+	private Float idColmeia;
 	
 	private Float contadorAnaliseAtividadeEnxame;
 	
@@ -16,14 +18,23 @@ public class DadosApiarioRequisicao {
 	
 	private Float som;
 	
-	private Float peso;
+	private Float peso;	
+		
 
-	public Float getTenantId() {
-		return tenantId;
+	public Float getIdColmeia() {
+		return idColmeia;
 	}
 
-	public void setTenantId(Float tenantId) {
-		this.tenantId = tenantId;
+	public void setIdColmeia(Float idColmeia) {
+		this.idColmeia = idColmeia;
+	}
+
+	public Float getIdTenant() {
+		return idTenant;
+	}
+
+	public void setIdTenant(Float idTenant) {
+		this.idTenant = idTenant;
 	}
 
 	public Float getContadorAnaliseAtividadeEnxame() {
